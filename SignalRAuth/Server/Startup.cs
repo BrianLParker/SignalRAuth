@@ -13,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using System.Linq;
 using SignalRAuth.Server.Data;
 using SignalRAuth.Server.Models;
+using SignalRAuth.Server.Hubs;
 
 namespace SignalRAuth.Server
 {
@@ -29,6 +30,7 @@ namespace SignalRAuth.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSignalR();
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
@@ -44,11 +46,17 @@ namespace SignalRAuth.Server
 
             services.AddControllersWithViews();
             services.AddRazorPages();
+            services.AddResponseCompression(opts =>
+            {
+                opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+                    new[] { "application/octet-stream" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseResponseCompression();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -76,6 +84,7 @@ namespace SignalRAuth.Server
             {
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
+                endpoints.MapHub<ChatHub>("/chathub");
                 endpoints.MapFallbackToFile("index.html");
             });
         }
