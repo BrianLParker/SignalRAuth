@@ -14,6 +14,9 @@ using System.Linq;
 using SignalRAuth.Server.Data;
 using SignalRAuth.Server.Models;
 using SignalRAuth.Server.Hubs;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace SignalRAuth.Server
 {
@@ -43,6 +46,10 @@ namespace SignalRAuth.Server
 
             services.AddAuthentication()
                 .AddIdentityServerJwt();
+
+            services.TryAddEnumerable(
+                ServiceDescriptor.Singleton<IPostConfigureOptions<JwtBearerOptions>,
+                ConfigureJwtBearerOptions>());
 
             services.AddControllersWithViews();
             services.AddRazorPages();
@@ -84,7 +91,7 @@ namespace SignalRAuth.Server
             {
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
-                endpoints.MapHub<ChatHub>("/chathub");
+                endpoints.MapHub<ChatHub>("hubs/chathub");
                 endpoints.MapFallbackToFile("index.html");
             });
         }

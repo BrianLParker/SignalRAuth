@@ -45,7 +45,7 @@
     {
 
         hubConnection = new HubConnectionBuilder()
-            .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"), options =>
+            .WithUrl(NavigationManager.ToAbsoluteUri("hubs/chathub"), options =>
             {
                 options.AccessTokenProvider = async () =>
                 {
